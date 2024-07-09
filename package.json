@@ -2,6 +2,7 @@
   "name": "mantine-colors",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://huythangphan.github.io/mantine-colors/",
   "dependencies": {
     "@mantine/colors-generator": "7.11.1",
     "@mantine/core": "7.11.1",
@@ -21,7 +22,6 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "homepage": "https://huythangphan.github.io/mantine-colors/",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
