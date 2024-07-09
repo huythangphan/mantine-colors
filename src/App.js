@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-import { getCSSColorVariables, MantineProvider, createTheme, ColorInput, Group, Box, Text, Divider, Stack, Button } from '@mantine/core'
+import { getCSSColorVariables, MantineProvider, createTheme, ColorInput, Group, Box, Text, Divider, Stack, Button, useMantineColorScheme, ActionIcon, Flex } from '@mantine/core'
 import { generateColorsMap, generateColors } from '@mantine/colors-generator'
+import { IconSun, IconMoonStars } from '@tabler/icons-react';
 
 const getNumberFromString = (str) => Number(str.match(/(\d+)/)[0])
 
@@ -20,8 +21,8 @@ const isValidHex = (color) =>{
 
 function App() {
   // -- input color --
-  const [color, setColor] = useState('#F36F20');
-  const prevColor = useRef('#F36F20')
+  const [color, setColor] = useState('#f36f20');
+  const prevColor = useRef('#f36f20')
 
   const resolveCSSVars = () => {
     const baseColor = isValidHex(color) ? color : prevColor.current
@@ -72,7 +73,7 @@ function App() {
     hexColors[baseColorIndex] = baseColor
   
     const { light, dark } = resolveCSSVars(baseColor)
-  
+    console.log({light, dark})
     return {
       baseColorIndex,
       colors: hexColors,
@@ -107,6 +108,10 @@ function App() {
     darkColors,
   } = getColors()
 
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+
+  const displayColors = colorScheme === 'dark' ? darkColors : lightColors
+
   useEffect(() => {
     if (isValidHex(color)) {
       prevColor.current = color
@@ -120,12 +125,25 @@ function App() {
           primary: generateColors(isValidHex(color) ? color : prevColor.current),
         },
         primaryColor: 'primary',
+        colorScheme,
       })}
       cssVariablesResolver={resolveCSSVars}
     >
       <div className="App">
         {/* color input */}
         <ColorInput style={{ width: 'fit-content' }} label="Input color" value={color} onChange={setColor} />
+
+        <Flex my="md" align="center">
+          <ActionIcon
+            variant="outline"
+            color={colorScheme === 'dark' ? 'yellow' : 'blue'}
+            onClick={() => toggleColorScheme()}
+            title="Toggle color scheme"
+          >
+            {colorScheme === 'dark' ? <IconSun size="1.1rem" /> : <IconMoonStars size="1.1rem" />}
+          </ActionIcon>
+          <Text ml="xs" onClick={() => toggleColorScheme()}>Toggle to see in light/dark mode</Text>
+        </Flex>
 
         {/* list colors */}
         <Group mt="md">
@@ -138,45 +156,32 @@ function App() {
           ))}
         </Group>
 
-        <Divider label="Light mode" labelPosition="center" />
+        <Stack>
+          <Flex align="center">
+            <Button variant="filled" style={{ width: 'fit-content' }}>Filled button</Button>
+            <Text ml="xs">Background: {displayColors.filled}, hover: {displayColors.filledHover}</Text>
+          </Flex>
+          
+          <Flex align="center">
+            <Button variant="light" style={{ width: 'fit-content' }}>Light button</Button>
+            <Text ml="xs">Background: {displayColors.light}, hover: {displayColors.lightHover}, text color: {displayColors.lightColor}</Text>
+          </Flex>
 
-        <Stack style={{ width: 'fit-content' }}>
-          <Button variant="filled">Filled button</Button>
-          <Text>Background: {lightColors.filled}, hover: {lightColors.filledHover}</Text>
+          <Flex align="center">
+            <Button variant="outline" style={{ width: 'fit-content' }}>Outline button</Button>
+            <Text ml="xs">Background: {displayColors.outline}, hover: {displayColors.outlineHover}</Text>
+          </Flex>
 
-          <Button variant="light">Light button</Button>
-          <Text>Background: {lightColors.light}, hover: {lightColors.lightHover}, text color: {lightColors.lightColor}</Text>
+          <Flex align="center">
+            <Button variant="subtle" style={{ width: 'fit-content' }}>Subtle button</Button>
+            <Text ml="xs">Background: transparent, hover: {displayColors.lightHover}, text color: {displayColors.lightColor}</Text>
+          </Flex>
 
-          <Button variant="outline">Outline button</Button>
-          <Text>Background: {lightColors.outline}, hover: {lightColors.outlineHover}</Text>
-
-          <Button variant="subtle">Subtle button</Button>
-          <Text>Background: transparent, hover: {lightColors.lightHover}, text color: {lightColors.lightColor}</Text>
-
-          <Text>Text</Text>
-          <Text>Text: {lightColors.text}</Text>
+          <Flex align="center">
+            <Text>Text:</Text>
+            <Text ml="xs">{displayColors.text}</Text>
+          </Flex>
         </Stack>
-
-        <div style={{ background: '#000' }}>
-          <Divider color="white" label="Dark mode" labelPosition="center" />
-
-          <Stack style={{ width: 'fit-content' }}>
-            <Button variant="filled">Filled button</Button>
-            <Text>Background: {darkColors.filled}, hover: {darkColors.filledHover}</Text>
-
-            <Button variant="light">Light button</Button>
-            <Text>Background: {darkColors.light}, hover: {darkColors.lightHover}, text color: {darkColors.lightColor}</Text>
-
-            <Button variant="outline">Outline button</Button>
-            <Text>Background: {darkColors.outline}, hover: {darkColors.outlineHover}</Text>
-
-            <Button variant="subtle">Subtle button</Button>
-            <Text>Background: transparent, hover: {darkColors.lightHover}, text color: {darkColors.lightColor}</Text>
-
-            <Text>Text</Text>
-            <Text>Text: {darkColors.text}</Text>
-          </Stack>
-        </div>
       </div>
     </MantineProvider>
   );
